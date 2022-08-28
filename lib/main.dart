@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:gallery_saver/gallery_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 Future<void> main() async {
   // Ensure that plugin services are initialized so that `availableCameras()`
@@ -14,6 +16,9 @@ Future<void> main() async {
 
   // Get a specific camera from the list of available cameras.
   final firstCamera = cameras.first;
+
+  var status = await Permission.storage.request();
+  debugPrint('storage permission = $status');
 
   runApp(
     MaterialApp(
@@ -97,6 +102,10 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             // Attempt to take a picture and get the file `image`
             // where it was saved.
             final image = await _controller.takePicture();
+            final result = await GallerySaver.saveImage(image.path,
+                toDcim: true, albumName: 'flutter');
+            debugPrint(
+                'GallerySaver.saveImage returns $result for ${image.path}');
 
             if (!mounted) return;
 
